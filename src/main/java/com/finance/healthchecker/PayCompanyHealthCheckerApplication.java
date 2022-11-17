@@ -18,13 +18,13 @@ public class PayCompanyHealthCheckerApplication {
         try{
             while(true) {
                 Request request = new Request.Builder()
-                        .url("http://localhost:8080/v1/doAllHealthCheck")
+                        .url("http://localhost:8090/v1/doAllHealthCheck")
                         .build();
 
                 OKHttpClient okClient = new OKHttpClient(request);
                 int code = okClient.doUsingHttp();
                 System.out.println("code:"+ code);
-                Thread.sleep(5*1000);
+                Thread.sleep(30*1000);
             }
         }catch (Exception e){
             e.printStackTrace();

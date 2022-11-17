@@ -4,9 +4,8 @@ import com.finance.healthchecker.comm.util.OKHttpClient;
 import com.finance.healthchecker.comm.util.SlackUtil;
 import com.finance.healthchecker.comm.util.TranFormat;
 import com.finance.healthchecker.entity.CustomErrorType;
-import okhttp3.MultipartBody;
 import okhttp3.Request;
-import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,9 @@ import java.util.Hashtable;
 @RestController
 @RequestMapping("/v1")
 public class HealthCheckController {
+
+    @Autowired
+    SlackUtil slackUtil;
 
     @RequestMapping(value = "/doAllHealthCheck", method = RequestMethod.GET)
     public ResponseEntity<String> doAllHealthCheck() {
@@ -43,15 +45,17 @@ public class HealthCheckController {
                 okClient = new OKHttpClient(request);
                 code = okClient.doUsingHttp();
 
+
                 // 200OK, 403Forbidden
                 if (code == 200 || code == 403 ) {
                     //System.out.println(pg_provider + " is ok");
+                    //slackUtil.postSlackMessage(pg_provider + " is ok");
                 }else{
                     String today = TranFormat.getToday();
-                    if(TranFormat.isAlerted(today, today+pg_provider) == false){
+                    //if(TranFormat.isAlerted(today, today+pg_provider) == false){
                         //System.out.println(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: " );
-                        SlackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: ");
-                    }
+                        this.slackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: ");
+                    //}
                 }
             }
 
