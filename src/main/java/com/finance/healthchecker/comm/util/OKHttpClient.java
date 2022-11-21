@@ -18,12 +18,14 @@ public class OKHttpClient {
 	
 	public boolean isConnect = true;
 	public String error_msg = "";
+
 	
 	public OKHttpClient(Request request){
 		this.request = request;
     }
 	
 	public int doUsingHttp() throws Exception {
+		int code = 0;
 		Response response = null;
 		try{
 
@@ -41,15 +43,16 @@ public class OKHttpClient {
 				this.isConnect = false;
 				this.error_msg = response.toString();
 			}
+
+			if(response != null) {
+				code = response.code();
+			}
 			
 		} catch (Exception e) {
 			this.isConnect = false;
 			this.error_msg = "[ERROR] efnc.cardv2.batch.util.OKHttpClient.doUsingHttp() \n"+ e.toString();
-		}
-
-		int code = 0;
-		if(response != null) {
-			code = response.code();
+		} finally {
+			response.close();
 		}
 
 		return code;

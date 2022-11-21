@@ -7,24 +7,21 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
-public class SlackUtil {
+public  class SlackUtil {
 
-    @Value("${slack.comparebot.token}")
-    private String slack_token;
+    private static String slack_token = System.getenv("slack.comparebot.token");
 
-    @Value("${slack.channel.id}")
-    private String slack_channel_id;
+    private static String slack_channel_id = System.getenv("slack.channel.id");
 
-    public void postSlackMessage(String message){
+    public static void postSlackMessage(String message){
         try {
 
             Slack slack = Slack.getInstance();
-            MethodsClient methods = slack.methods(this.slack_token);
+            MethodsClient methods = slack.methods(slack_token);
 
             // Build a request object
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel(this.slack_channel_id)
+                    .channel(slack_channel_id)
                     .text(message)
                     .build();
 

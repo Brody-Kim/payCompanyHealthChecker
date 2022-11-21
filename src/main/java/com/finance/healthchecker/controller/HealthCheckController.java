@@ -20,9 +20,6 @@ import java.util.Hashtable;
 @RequestMapping("/v1")
 public class HealthCheckController {
 
-    @Autowired
-    SlackUtil slackUtil;
-
     @RequestMapping(value = "/doAllHealthCheck", method = RequestMethod.GET)
     public ResponseEntity<String> doAllHealthCheck() {
 
@@ -49,12 +46,12 @@ public class HealthCheckController {
                 // 200OK, 403Forbidden
                 if (code == 200 || code == 403 ) {
                     //System.out.println(pg_provider + " is ok");
-                    //slackUtil.postSlackMessage(pg_provider + " is ok");
+                    //SlackUtil.postSlackMessage(pg_provider + " is ok");
                 }else{
                     String today = TranFormat.getToday();
                     //if(TranFormat.isAlerted(today, today+pg_provider) == false){
                         //System.out.println(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: " );
-                        this.slackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: ");
+                        SlackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: ");
                     //}
                 }
             }

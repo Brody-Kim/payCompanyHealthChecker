@@ -143,7 +143,7 @@ public class TranFormat {
         checkUrlHash.put("tosspay", "https://pay.toss.im/payfront/web/login");
         checkUrlHash.put("paypal", "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-9BG89631P81638708");
         checkUrlHash.put("settle", "https://npg.settlebank.co.kr/card/NewCardAction.do?PHash=&PData=&PStateCd=&POrderId=&PNoteUrl=https%3A%2F%2Fservice.iamport.kr%2Fsettle_payments%2Fresult&PNextPUrl=https%3A%2F%2Fservice.iamport.kr%2Fsettle_payments%2Frelay%2Fnew&PCancPUrl=https%3A%2F%2Fservice.iamport.kr%2Fsettle_payments%2Fclose%2Fnew&PEmail=gildong%40gmail.com&PPhone=010-4242-4242&POid=imp_922572453567&t_PGoods=%EA%B0%80%EB%82%98%EB%8B%A4%EB%9D%BC&t_PNoti=imp_uid%3Dimp_922572453567%7Crequest_id%3Dreq_1668224575203%7Cuser_code%3Dimp60208978&t_PMname=&t_PUname=%EB%A7%88%EB%B0%94%EC%82%AC&t_PBname=%EB%A7%88%EB%B0%94%EC%82%AC&PEname=&PVtransDt=&PUserid=&PCardType=&PChainUserId=&PGoods=%25EA%25B0%2580%25EB%2582%2598%25EB%258B%25A4%25EB%259D%25BC&PNoti=imp_uid%3Dimp_922572453567%257Crequest_id%3Dreq_1668224575203%257Cuser_code%3Dimp60208978&PMname=&PUname=%25EB%25A7%2588%25EB%25B0%2594%25EC%2582%25AC&PBname=%25EB%25A7%2588%25EB%25B0%2594%25EC%2582%25AC&PMid=mid_test&PAmt=1000");
-        checkUrlHash.put("kiwoompay", "https://ssltest.kiwoompay.co.kr/card2/DaouDirectCardSelect.jsp");
+        checkUrlHash.put("kiwoompay", "https://ssl.kiwoompay.co.kr/card2/DaouDirectCardSelect.jsp");
     };
     public static String getCheckUrl(String pg_provider) throws Exception{
         return (String) checkUrlHash.get(pg_provider);
