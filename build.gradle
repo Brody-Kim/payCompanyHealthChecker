@@ -21,6 +21,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:junit-jupiter'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.30'
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
     implementation 'com.slack.api:bolt:1.18.0'
     implementation 'com.slack.api:bolt-servlet:1.26.1'

@@ -101,7 +101,7 @@ public class TranFormat {
         return sb.toString();
     }
 
-    public static String tranNumberFormat(int num){
+    public static String tranNumberFormat(long num){
         DecimalFormat formatter = new DecimalFormat("###,###");
         return formatter.format(num);
     }
@@ -190,6 +190,14 @@ public class TranFormat {
 
         String today = SDF.format(calendar.getTime());
         return today;
+    }
+
+    public static String getTime() {
+        Calendar calendar = new GregorianCalendar();
+        SimpleDateFormat SDF = new SimpleDateFormat("HHmmss");
+
+        String time = SDF.format(calendar.getTime());
+        return time;
     }
 
 }

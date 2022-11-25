@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 public  class SlackUtil {
 
-    private static String slack_token = System.getenv("slack.comparebot.token");
+    private static String slack_token = System.getenv("CONF_SLACK_MONITORBOT_TOKEN");
 
-    private static String slack_channel_id = System.getenv("slack.channel.id");
+    private static String slack_channel_id = System.getenv("CONF_SLACK_CHANNEL_ID");
 
     public static void postSlackMessage(String message){
         try {
@@ -27,6 +27,7 @@ public  class SlackUtil {
 
             // Get a response as a Java object
             ChatPostMessageResponse response = methods.chatPostMessage(request);
+            //System.out.println(response.toString());
 
         }catch(Exception e){
             e.printStackTrace();
