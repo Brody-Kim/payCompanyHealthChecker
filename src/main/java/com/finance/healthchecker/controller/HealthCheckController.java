@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+
 
 @RestController
 @RequestMapping("/v1")
@@ -55,7 +55,7 @@ public class HealthCheckController {
                     String today = TranFormat.getToday();
                     //if(TranFormat.isAlerted(today, today+pg_provider) == false){
                         //System.out.println(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: " );
-                        SlackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "checout page!!! :alert: ");
+                    SlackUtil.postSlackMessage(":alert: Please, Check "+pg_provider+ "check-out page!!! :alert: ");
                     //}
                 }
             }
@@ -71,9 +71,10 @@ public class HealthCheckController {
 
     }
 
-    @RequestMapping(value = "/doOpenMonitoring/{user_id}/{user_nm}/{openDttm}", method = RequestMethod.GET)
+    @RequestMapping(value = "/doOpenMonitoring/{user_id}/{user_nm}/{pg_id}/{openDttm}", method = RequestMethod.GET)
     public ResponseEntity<String> doOpenMonitoring(@PathVariable("user_id") String user_id,
                                                    @PathVariable("user_nm") String user_nm,
+                                                   @PathVariable("pg_id") String pg_id,
                                                    @PathVariable("openDttm") String openDttm) {
 
 
@@ -99,18 +100,43 @@ public class HealthCheckController {
             System.out.println("lastCheckTime: "+lastCheckTime);
 
             //3시간마다 체크
-            if (lastCheckTime == null || lastCheckTime == 0L || (nowTime - lastCheckTime)/1000 >= 60*3){
+            if (lastCheckTime == null || lastCheckTime == 0L || (nowTime - lastCheckTime)/1000 >= 60*60*3){
 
                 DataControl control = new DataControl();
                 String searchResult = "[" + user_nm + "]\n";
-                ArrayList paymentsList = control.getPaymentsData(user_id, openDttm);
+                ArrayList paymentsList = control.getPaymentsData(user_id, pg_id, openDttm);
                 if (paymentsList != null && paymentsList.size() > 0) {
-                    for (int i = 0; i < paymentsList.size(); i++) {
+                   System.out.println("paymentsList: "+paymentsList.size());
+                   for (int i = 0; i < paymentsList.size(); i++) {
                         PaymentsEntity entity = (PaymentsEntity) paymentsList.get(i);
-                        searchResult += entity.getPg_provider() + " : " + entity.getPg_id() + " : " + entity.getPay_method() + " : "
-                                + TranFormat.tranNumberFormat(entity.getPay_cnt()) + "건" + " : " + TranFormat.tranNumberFormat(entity.getAmount()) + " ("+ entity.getCurrency()+")\n";
-                    }
+                        searchResult += entity.getPg_provider() + " : " + entity.getPg_id() + " : " + entity.getPay_method() + " : " + entity.getStatus() + " : "
+                                     + TranFormat.tranNumberFormat(entity.getPay_cnt()) + "건" + " : " + TranFormat.tranNumberFormat(entity.getAmount()) + " ("+ entity.getCurrency()+")\n";
+                   }
+
+
+                   ArrayList paymentsFirstPaidList = control.getFirstPaidData(user_id, pg_id, openDttm);
+                   if (paymentsFirstPaidList != null && paymentsFirstPaidList.size() > 0) {
+                       searchResult += "[첫 결제성공]";
+                       PaymentsEntity entity = (PaymentsEntity) paymentsFirstPaidList.get(0);
+                       searchResult += entity.getImp_uid() + " : " + entity.getBuyer_email() + " : "
+                                    +  entity.getPaid_at() + " : "
+                                    + TranFormat.tranNumberFormat(entity.getAmount()) + " ("+ entity.getCurrency()+")\n";
+                   }
+
+                   ArrayList paymentsFailList = control.getFailData(user_id, pg_id, openDttm);
+                   if (paymentsFailList != null && paymentsFailList.size() > 0) {
+                       searchResult += "[실패리스트]";
+                       for (int i = 0; i < paymentsFailList.size(); i++) {
+                           System.out.println("paymentsFailList: "+paymentsFailList.size());
+                           PaymentsEntity entity = (PaymentsEntity) paymentsFailList.get(i);
+                           searchResult += entity.getFail_reason() + " : "
+                                   + TranFormat.tranNumberFormat(entity.getPay_cnt()) + "건 \n";
+                       }
+                   }
+                }else {
+                    searchResult += "아직 결제가 없네유~ :blobnervouspleading:";
                 }
+
                 queue.put(user_id, nowTime);
                 SlackUtil.postSlackMessage(searchResult);
             }else{

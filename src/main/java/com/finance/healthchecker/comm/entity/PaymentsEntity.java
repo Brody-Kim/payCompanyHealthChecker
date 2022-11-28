@@ -19,12 +19,21 @@ public class PaymentsEntity {
 	String pg_id;
 	String vbank_num;
 	String currency;
+	String buyer_email;
 	Long amount;
 	Double d_amount;
 	Long cancel_amount;
 	Long org_amount;
 	Long payment_id;
 	Long pay_cnt;
+
+	public String getBuyer_email() {
+		return buyer_email;
+	}
+
+	public void setBuyer_email(String buyer_email) {
+		this.buyer_email = buyer_email;
+	}
 
 	public String getCurrency() {
 		return currency;

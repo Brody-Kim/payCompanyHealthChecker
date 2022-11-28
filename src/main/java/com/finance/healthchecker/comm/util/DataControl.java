@@ -25,7 +25,7 @@ public class DataControl {
 	}
 
 
-	public ArrayList getPaymentsData(String user_id, String openDttm) throws Exception {
+	public ArrayList getPaymentsData(String user_id, String pg_id, String openDttm) throws Exception {
 
 		ArrayList retList = new ArrayList();
 
@@ -44,11 +44,14 @@ public class DataControl {
 		query.append("\n select pg_id, pg_provider, pay_method, status, currency, count(*), sum(amount)  ")
 			 .append("\n from payments p  ")
 			 .append("\n where p.user_id = " + user_id)
-			 .append("\n and   p.amount > 0 ") // exclude issue bill key
-		     .append("\n and   p.sandbox = 0")
+		     .append("\n and   p.sandbox = 0 ")
+			 .append("\n and   p.status in ('paid','failed','cancelled') ")
 			 .append("\n and   p.created >= '"+openDttm.substring(0,8)+"000000' ")
-		 	 .append("\n and   p.created <= now() ")
-		 	 .append("\n group by pg_id, pg_provider, pay_method, status, currency ");
+		 	 .append("\n and   p.created <= now() ");
+		if("ALL".equals(pg_id)==false){
+			query.append("\n and p.pg_id = '"+pg_id+"' ");
+		}
+		query.append("\n group by pg_id, pg_provider, pay_method, status, currency ");
 
 		try {
 			stmt = this.conn.createStatement();
@@ -236,6 +239,106 @@ public class DataControl {
 				entity.setPg_tid(rs.getString(4));
 				entity.setD_amount(rs.getDouble(5));
 				entity.setCancel_pg_tid(rs.getString(6));
+
+				retList.add(entity);
+			}
+
+		} catch (Exception e) {
+			//LogTrace.trace("finance.portone.comm.util.DataControl.getPaymentsData",e.toString());
+			e.printStackTrace();
+		} finally {
+			if(rs != null)
+				rs.close();
+			if(stmt != null)
+				stmt.close();
+			this.ReleaseConnection();
+		}
+		return retList;
+	}
+
+	public ArrayList getFailData(String user_id, String pg_id, String openDttm) throws Exception {
+
+		ArrayList retList = new ArrayList();
+
+		StringBuffer query = new StringBuffer();
+		Statement stmt = null;
+		ResultSet rs = null;
+		this.conn = connection.getConnection("mysql");
+
+		query.append("\n select fail_reason, count(*) ")
+				.append("\n from payments p " )
+				.append("\n where p.user_id = " + user_id)
+				.append("\n and   p.sandbox = 0")
+				.append("\n and   p.created >= '"+openDttm.substring(0,8)+"000000' ")
+				.append("\n and   p.created <= now() ")
+		        .append("\n and   p.status = 'failed' ");
+		if("ALL".equals(pg_id)==false){
+			query.append("\n and p.pg_id = '"+pg_id+"' ");
+		}
+		query.append("\n group by fail_reason ");
+
+
+		try {
+			stmt = this.conn.createStatement();
+			rs = stmt.executeQuery(query.toString());
+
+			while(rs.next()){
+
+				PaymentsEntity entity = new PaymentsEntity();
+				entity.setFail_reason(rs.getString(1));
+				entity.setPay_cnt(rs.getLong(2));
+
+				retList.add(entity);
+			}
+
+		} catch (Exception e) {
+			//LogTrace.trace("finance.portone.comm.util.DataControl.getPaymentsData",e.toString());
+			e.printStackTrace();
+		} finally {
+			if(rs != null)
+				rs.close();
+			if(stmt != null)
+				stmt.close();
+			this.ReleaseConnection();
+		}
+		return retList;
+	}
+
+	public ArrayList getFirstPaidData(String user_id, String pg_id ,String openDttm) throws Exception {
+
+		ArrayList retList = new ArrayList();
+
+		StringBuffer query = new StringBuffer();
+		Statement stmt = null;
+		ResultSet rs = null;
+		this.conn = connection.getConnection("mysql");
+
+		query.append("\n select imp_uid, amount, currency, buyer_email, paid_at ")
+			 .append("\n from payments p " )
+			 .append("\n where p.user_id = " + user_id)
+			 .append("\n and   p.sandbox = 0")
+			 .append("\n and   p.amount = 0 ")
+			 .append("\n and   p.status = 'paid' ")
+			 .append("\n and   p.created >= '"+openDttm.substring(0,8)+"000000' ")
+			 .append("\n and   p.created <= now() ");
+		if("ALL".equals(pg_id)==false){
+			query.append("\n and p.pg_id = '"+pg_id+"' ");
+		}
+		query.append("\n order by created  ");
+
+
+		try {
+			stmt = this.conn.createStatement();
+			rs = stmt.executeQuery(query.toString());
+
+			while(rs.next()){
+
+				PaymentsEntity entity = new PaymentsEntity();
+				entity.setImp_uid(rs.getString(1));
+				entity.setAmount(rs.getLong(2));
+				entity.setCurrency(rs.getString(3));
+				entity.setBuyer_email(rs.getString(4));
+				entity.setPaid_at(rs.getString(5));
 
 				retList.add(entity);
 			}
